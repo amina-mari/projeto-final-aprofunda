@@ -1,0 +1,6 @@
+/* Resetando as margens do body e definindo a fonte padrão */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
