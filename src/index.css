@@ -1,6 +1,18 @@
-/* Resetando as margens do body e definindo a fonte padrão */
-body {
+@import url('https://fonts.googleapis.com/css2?family=Italiana&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap');
+
+* {
   margin: 0;
-  font-family: 'Arial', sans-serif;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Italiana', serif;
 }
 
+html, body {
+  height: 100%;
+}
+
+a {
+  text-decoration: none;
+}
