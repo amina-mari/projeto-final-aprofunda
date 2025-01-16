@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import * as S from "./styles";
 import despesasMock from "../mocks/despesas.json";
+import ChatGemini from '../components/chat-gemini/ChatGemini';
 
 const Dashboard = () => {
   const [despesas] = useState(despesasMock);
@@ -60,6 +61,7 @@ const Dashboard = () => {
           ))}
         </tbody>
       </S.StyledTable>
+      <ChatGemini despesas={despesas}/>
     </S.TableContainer>
   );
   
