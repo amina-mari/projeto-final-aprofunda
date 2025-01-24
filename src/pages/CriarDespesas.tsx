@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import * as S from "./styles";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../services/firebase';
+import http from '../http';
 
 const CriarDespesas = () => {
+  const [user] = useAuthState(auth);
+
   const [form, setForm] = useState({
     descricao: "",
     categoria: "",
@@ -10,38 +15,51 @@ const CriarDespesas = () => {
     data: "",
   });
   
-  const [pdfFile, setPdfFile] = useState<File | null>(null); // Estado para armazenar o arquivo PDF
   const [isSubmitted, setIsSubmitted] = useState(false); // Estado para controlar a mensagem de sucesso
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: { target: { name: any; value: any; }; }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    console.log("Dados enviados:", form);
-    if (pdfFile) {
-      console.log("Arquivo PDF selecionado:", pdfFile.name);
+
+    const despesaData = {
+      descricao: form.descricao,
+      categoria: form.categoria,
+      valor: form.valor,
+      tipo: form.tipo,
+      data: form.data,
+      userId: user?.uid
     }
+    
+    setIsLoading(true);
 
-    // Mostrar a mensagem de sucesso
-    setIsSubmitted(true);
+    try {
+      const response = await http.post("despesas", despesaData, {
+        headers: {
+          "Content-Type": "applications/json"
+        }
+      });
+      setIsSubmitted(true);
 
-    // Esconder a mensagem após 3 segundos
-    setTimeout(() => {
-      setIsSubmitted(false);
-    }, 3000);
-
-    // Aqui futuramente será implementada a integração com o backend
-  };
-
-  const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      setPdfFile(file); // Armazenar o arquivo PDF no estado
-      alert(`PDF selecionado: ${file.name}`);
-    } else {
-      alert('Por favor, selecione um arquivo PDF.');
+      setForm({
+        descricao: "",
+        categoria: "",
+        valor: "",
+        tipo: "entrada",
+        data: ""
+      })
+  
+      setTimeout(() => {
+        setIsSubmitted(false);
+      }, 3000);
+      
+    } catch (error) {
+      console.error("Erro ao enviar despesa: ", error)
+    } finally {
+      setIsLoading(false)
     }
   };
 
@@ -79,29 +97,13 @@ const CriarDespesas = () => {
           value={form.data}
           onChange={handleChange}
         />
-        
-        {/* Botão para upload de PDF */}
-        <S.UploadContainer>
-          <S.UploadButton>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={handlePdfUpload}
-              style={{ display: 'none' }} // Ocultar o input file
-            />
-            <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
-              Upload de Nota Fiscal.
-            </label>
-          </S.UploadButton>
-        </S.UploadContainer>
-
-        {/* Exibindo o nome do PDF selecionado */}
-        {pdfFile && <p>PDF Selecionado: {pdfFile.name}</p>}
 
         {/* Exibir a mensagem de sucesso */}
-        {isSubmitted && <S.SuccessMessage>Nota enviada com sucesso!</S.SuccessMessage>}
+        {isSubmitted && <S.SuccessMessage>Despesa enviada com sucesso!</S.SuccessMessage>}
 
-        <S.Button type="submit">Enviar</S.Button>
+        <S.Button type="submit" disabled={isLoading}>
+          {isLoading ? "Enviando..." : "Enviar"}
+        </S.Button>
       </S.Form>
     </S.Container>
   );
