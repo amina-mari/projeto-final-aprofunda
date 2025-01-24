@@ -42,6 +42,9 @@ const CriarDespesas = () => {
           "Content-Type": "applications/json"
         }
       });
+
+      console.log("Resposta da API:", response.data);
+
       setIsSubmitted(true);
 
       setForm({
