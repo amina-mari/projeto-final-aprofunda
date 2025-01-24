@@ -37,7 +37,8 @@ const CriarDespesas = () => {
     setIsLoading(true);
 
     try {
-      const response = await http.post("despesas", JSON.stringify(despesaData), {
+      console.log(despesaData);
+      const response = await http.post("/despesas", despesaData, {
         headers: {
           "Content-Type": "applications/json"
         }
